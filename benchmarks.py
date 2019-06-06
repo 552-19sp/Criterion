@@ -7,6 +7,7 @@ import sys
 
 NUM_CLIENTS = [1, 2, 3] # Number of clients to benchmark with.
 NUM_SERVERS = [3, 5] # Number of servers each test cluster should have.
+DROP_RATES = [0, 1, 5] # Out of 1000, the server drop rates to test.
 NUM_BENCH_OPS = 500 # Number of ops to test per benchmark.
 NUM_CLIENT_OPS = 10000 # Number of background client ops.
 
@@ -58,26 +59,18 @@ def run_benchmark(num_clients, num_servers, drop_rate, random_failures, writer):
             proc.kill()
 
     avg_latency = round((end - start) * 1000 / NUM_BENCH_OPS)
-    print("random failures: {}/{} clients/{} servers/{} drop rate: {} ms".format(
-        failure_code, num_clients, num_servers, drop_rate, avg_latency))
-    writer.writerow([failure_code, num_clients, num_servers, drop_rate, avg_latency])
-
-
-def run_tcp_mencius_benchmarks(writer):
-    """ Runs all the benchmarks for TCP Mencius. """
-    writer.writerow(['Mencius', 'TCP'])
-    for num_clients in NUM_CLIENTS:
-        for num_servers in NUM_SERVERS:
-            run_benchmark(num_clients, num_servers, NO_DROP_RATE, False, writer)
-    for num_clients in NUM_CLIENTS:
-        for num_servers in NUM_SERVERS:
-            run_benchmark(num_clients, num_servers, NO_DROP_RATE, True, writer)
+    print("{} clients/{} servers/{} drop rate/{} random failures/latency: {} ms".format(
+        num_clients, num_servers, drop_rate, failure_code, avg_latency))
+    writer.writerow([num_clients, num_servers, drop_rate, failure_code, avg_latency])
 
 
 def run_benchmark_suite(writer):
-    """ Run all benchmarks. """
-    print("Starting TCP benchmarks...")
-    run_tcp_mencius_benchmarks(writer)
+    """ Runs all the benchmarks for the suite.. """
+    for num_clients in NUM_CLIENTS:
+        for num_servers in NUM_SERVERS:
+            for drop_rate in DROP_RATES:
+                run_benchmark(num_clients, num_servers, drop_rate, False, writer)
+                run_benchmark(num_clients, num_servers, drop_rate, True, writer)
 
 
 if __name__ == "__main__":

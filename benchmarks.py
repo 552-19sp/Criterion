@@ -3,6 +3,7 @@
 import subprocess
 import time
 import csv
+import sys
 
 NUM_CLIENTS = [1, 2, 3] # Number of clients to benchmark with.
 NUM_SERVERS = [3, 5] # Number of servers each test cluster should have.
@@ -17,7 +18,7 @@ RANDOM_FAILURE_CODE = 1
 
 NO_DROP_RATE = 0
 
-CLIENT_EXE = "../bin/client"
+CLIENT_EXE = ""
 
 
 def run_background_clients(num_clients, num_servers, drop_rate, failure_code):
@@ -80,6 +81,10 @@ def run_benchmark_suite(writer):
 
 
 if __name__ == "__main__":
-    with open('results.csv', mode='w') as output_file:
-        run_benchmark_suite(
-            csv.writer(output_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL))
+    if  len(sys.argv) != 2:
+        print("usage: python3 benchmarks.py <client exe>")
+    else:
+        CLIENT_EXE = sys.argv[1]
+        with open('results.csv', mode='w') as output_file:
+            run_benchmark_suite(
+                csv.writer(output_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL))

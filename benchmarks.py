@@ -8,8 +8,9 @@ import sys
 NUM_CLIENTS = [1, 2, 3] # Number of clients to benchmark with.
 NUM_SERVERS = [3, 5] # Number of servers each test cluster should have.
 DROP_RATES = [0, 1, 5] # Out of 1000, the server drop rates to test.
-NUM_BENCH_OPS = 500 # Number of ops to test per benchmark.
+NUM_BENCH_OPS = [100, 500, 1000, 2000] # Number of ops to test per benchmark.
 NUM_CLIENT_OPS = 10000 # Number of background client ops.
+NUM_ITERATIONS = 5
 
 CMD = "GET A"
 CLIENT_PROCS = []
@@ -31,15 +32,15 @@ def run_background_clients(num_clients, num_servers, drop_rate, failure_code):
             stdout=subprocess.PIPE))
 
 
-def run_benchmark_client(num_servers, drop_rate, failure_code):
+def run_benchmark_client(num_servers, drop_rate, failure_code, num_ops):
     """ Runs a new benchmark client as a subprocess. """
-    joined_ops = ','.join([CMD] * NUM_BENCH_OPS)
+    joined_ops = ','.join([CMD] * num_ops)
     subprocess.call(
         [CLIENT_EXE, str(num_servers), str(drop_rate), str(failure_code), joined_ops],
         stdout=subprocess.PIPE)
 
 
-def run_benchmark(num_clients, num_servers, drop_rate, random_failures, writer):
+def run_benchmark(num_clients, num_servers, drop_rate, num_ops, random_failures, writer):
     """ Runs a no failure benchmark with the specified parameters. """
     # Encode if random server failures should be allowed.
     failure_code = RANDOM_FAILURE_CODE if random_failures else NO_FAILURE_CODE
@@ -50,27 +51,30 @@ def run_benchmark(num_clients, num_servers, drop_rate, random_failures, writer):
 
     # Time benchmarking client.
     start = time.time()
-    run_benchmark_client(num_servers, drop_rate, failure_code)
+    run_benchmark_client(num_servers, drop_rate, failure_code, num_ops)
     end = time.time()
+
+    avg_latency = round((end - start) * 1000 / num_ops)
+    print("{} clients/{} servers/{} drop rate/{} random failures/latency: {} ms".format(
+        num_clients, num_servers, drop_rate, failure_code, avg_latency))
+    writer.writerow([num_clients, num_servers, drop_rate, failure_code, num_ops, avg_latency])
+
 
     # Kill background clients, if any.
     for proc in CLIENT_PROCS:
         if proc.poll() is None:
             proc.kill()
 
-    avg_latency = round((end - start) * 1000 / NUM_BENCH_OPS)
-    print("{} clients/{} servers/{} drop rate/{} random failures/latency: {} ms".format(
-        num_clients, num_servers, drop_rate, failure_code, avg_latency))
-    writer.writerow([num_clients, num_servers, drop_rate, failure_code, avg_latency])
-
 
 def run_benchmark_suite(writer):
     """ Runs all the benchmarks for the suite.. """
-    for num_clients in NUM_CLIENTS:
-        for num_servers in NUM_SERVERS:
-            for drop_rate in DROP_RATES:
-                run_benchmark(num_clients, num_servers, drop_rate, False, writer)
-                run_benchmark(num_clients, num_servers, drop_rate, True, writer)
+    for num_iterations in range(NUM_ITERATIONS):
+        for num_clients in NUM_CLIENTS:
+            for num_servers in NUM_SERVERS:
+                for drop_rate in DROP_RATES:
+                    for num_ops in NUM_BENCH_OPS:
+                        run_benchmark(num_clients, num_servers, drop_rate, num_ops, False, writer)
+                        run_benchmark(num_clients, num_servers, drop_rate, num_ops, True, writer)
 
 
 if __name__ == "__main__":

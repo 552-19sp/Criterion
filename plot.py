@@ -135,7 +135,7 @@ def plotReplicaComparison(tcp_data, udp_data):
                 ORDER BY AVG(avg_latency)"
         replica = ps.sqldf(replica_query, locals())
         best = replica.iloc[0, :]
-        udp_data_latency.append(best)
+        udp_data_latency.append(best.loc['avg'])
 
     y_map = {bar_labels[0]: tcp_data_latency, bar_labels[1]: udp_data_latency}
 

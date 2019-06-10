@@ -16,9 +16,14 @@ import pandasql as ps
 
 
 CSV = ""
-
 PLOTS_PER_GRAPH = 5
 
+"""
+Returns a DataFrame with the Error Bars given each of the configurations
+
+input_file: File
+
+"""
 def ingest(input_file):
     df = pd.read_csv(CSV, names=[
         'num_clients', 'num_servers', 'drop_rate', 'failure_code', 'num_ops', 'avg_latency'])
@@ -30,7 +35,16 @@ def ingest(input_file):
             FROM df \
             GROUP BY num_clients, num_servers, drop_rate, failure_code, num_ops"
     base_data = ps.sqldf(base_data_query, locals())
+    return base_data
 
+
+"""
+Plots a line graph containing the topN configurations with the highest average latency across all num_ops
+
+base_data: DataFrame
+
+"""
+def plotTopNLatency(base_data):
     # Line of each setting: Average latency across the same settings across num_ops
     line_query = "SELECT num_clients, num_servers, drop_rate, failure_code, AVG(avg_latency) AS avg \
             FROM base_data \
@@ -83,19 +97,68 @@ def ingest(input_file):
     for (name, error) in zip(line_label, error_bars):
         plot.errorbar(x_axis, y_map[name], yerr=[error[0], error[1]])
 
-    plt.show()
 
-    """
-    print("X axis: "  + str(x_axis))
-    print("Lines: " + str(line_label))
-    print("Lines Mapping: " + str(y_map))
-    print("Min/Max error: " + str(error_bars))
-    """
+"""
+Plots a bar graph containing the top configurations with the highest average latency across all num_ops for each number of replica for UDP and TCP
+
+tcp_data: DataFrame
+udp_data: DataFrame
+"""
+def plotReplicaComparison(tcp_data, udp_data):
+    tcp_data_latency = []
+    udp_data_latency = []
+
+    x_axis = ['3', '5']
+    bar_labels = ['TCP', 'UDP']
+
+    # TCP
+    for replica_count in x_axis:
+        # Average latency across the same settings across num_ops
+        tcp_table = tcp_data
+        replica_query = "SELECT num_clients, num_servers, drop_rate, failure_code, AVG(avg_latency) AS avg \
+                FROM tcp_table \
+                WHERE num_servers = " + replica_count + " GROUP BY \
+                num_clients, num_servers, drop_rate, failure_code \
+                ORDER BY AVG(avg_latency)"
+        replica = ps.sqldf(replica_query, locals())
+        best = replica.iloc[0, :]
+        tcp_data_latency.append(best.loc['avg'])
+    
+    # UDP
+    for replica_count in x_axis:
+        # Average latency across the same settings across num_ops
+        udp_table = udp_data
+        replica_query = "SELECT num_clients, num_servers, drop_rate, failure_code, AVG(avg_latency) AS avg \
+                FROM udp_table \
+                WHERE num_servers = " + replica_count + " GROUP BY \
+                num_clients, num_servers, drop_rate, failure_code \
+                ORDER BY AVG(avg_latency)"
+        replica = ps.sqldf(replica_query, locals())
+        best = replica.iloc[0, :]
+        udp_data_latency.append(best)
+
+    y_map = {bar_labels[0]: tcp_data_latency, bar_labels[1]: udp_data_latency}
+
+    # Plotting
+    graph = pd.DataFrame(y_map, index= x_axis, columns=bar_labels)
+    plot = graph.plot.bar(rot=0)
+    plot.set_xlabel("Number of Replica")
+    plot.set_ylabel("Latency")
+    plot.set_title("TCP VS UDP: Best Replica Latency")
+
 
 if __name__ == "__main__":
-    if  len(sys.argv) != 2:
+    if  (len(sys.argv) != 2 and len(sys.argv) != 3):
         print("usage: python3 plot.py <data csv>")
+        print("usage: python3 plot.py <TCP csv> <UDP csv>")
     else:
         CSV = sys.argv[1]
-        with open('results.csv', mode='r') as input_file:
-            ingest(input_file)
+
+        # Meta DataFrame of csv
+        base_data = 0
+        with open(CSV, mode='r') as input_file:
+            base_data = ingest(input_file)
+
+        plotTopNLatency(base_data)
+        plotReplicaComparison(base_data, base_data)
+        plt.show()

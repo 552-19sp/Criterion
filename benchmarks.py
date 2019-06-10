@@ -27,7 +27,7 @@ def run_background_clients(num_clients, num_servers, drop_rate, failure_code):
     for _ in range(num_clients):
         joined_ops = ','.join([CMD] * NUM_CLIENT_OPS)
         CLIENT_PROCS.append(subprocess.Popen(
-            (CLIENT_EXE, str(num_servers), str(failure_code), str(drop_rate), joined_ops),
+            (CLIENT_EXE, str(num_servers), str(drop_rate), str(failure_code), joined_ops),
             stdout=subprocess.PIPE))
 
 

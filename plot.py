@@ -204,7 +204,7 @@ def plotDropComparison(tcp_data, udp_data, label):
     tcp_data_latency = []
     udp_data_latency = []
 
-    x_axis = ['0', '1', '5']
+    x_axis = ['0', '2', '5']
     bar_labels = ['TCP', 'UDP']
 
     # TCP
@@ -238,7 +238,7 @@ def plotDropComparison(tcp_data, udp_data, label):
     # Plotting
     graph = pd.DataFrame(y_map, index= x_axis, columns=bar_labels)
     plot = graph.plot.bar(rot=0)
-    plot.set_xlabel("Drop Rate")
+    plot.set_xlabel("Drop Rate (Per 1000)")
     plot.set_ylabel("Latency")
     plot.set_title(label + " TCP VS UDP: Drop Rate Latency")
     

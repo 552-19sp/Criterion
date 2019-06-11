@@ -7,7 +7,7 @@ import sys
 
 NUM_CLIENTS = [1, 2, 3] # Number of clients to benchmark with.
 NUM_SERVERS = [3, 5] # Number of servers each test cluster should have.
-DROP_RATES = [0, 1, 5] # Out of 1000, the server drop rates to test.
+DROP_RATES = [0, 2, 5] # Out of 1000, the server drop rates to test.
 NUM_BENCH_OPS = [100, 500, 1000, 2000] # Number of ops to test per benchmark.
 NUM_CLIENT_OPS = 10000 # Number of background client ops.
 NUM_ITERATIONS = 5

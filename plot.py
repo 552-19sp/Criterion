@@ -75,25 +75,21 @@ def plotTopNLatency(base_data, label):
     x_axis = best_line_points[0].loc[:, 'num_ops'].values
 
     y_map = {}
-    error_bars = []
+    error_bars = [[]]
     for (name, lp) in zip(line_label, best_line_points):
         y_val = lp.loc[:, 'avg_latency'].values
         y_map[name] = y_val
 
         y_min = lp.loc[:, 'min_latency'].values
         y_max = lp.loc[:, 'max_latency'].values
-        error_bars.append((y_min, y_max))
+        error_bars.append((y_val - y_min, y_max - y_val))
 
     # Plotting
     graph = pd.DataFrame(y_map, index= x_axis, columns=line_label)
-    plot = graph.plot()
+    plot = graph.plot(yerr=error_bar[1:])
     plot.set_xlabel("Throughput")
     plot.set_ylabel("Latency")
     plot.set_title("Top Throughput VS Latency: " + label)
-
-    # Plotting: Error Bars
-    for (name, error) in zip(line_label, error_bars):
-        plot.errorbar(x_axis, y_map[name], yerr=[error[0], error[1]])
 
 
 """
@@ -124,8 +120,8 @@ def plotReplicaComparison(tcp_data, udp_data, label):
         best = replica.iloc[0, :]
 
         tcp_data_latency.append(best.loc['avg'])
-        y_min = best.loc['min']
-        y_max = best.loc['max']
+        y_min = best.loc['avg'] - best.loc['min']
+        y_max = best.loc['max'] - best.loc['avg']
         tcp_error_bars.append((y_min, y_max))
 
     tcpError = [[error[0] for error in tcp_error_bars], [error[1] for error in tcp_error_bars]]
@@ -145,8 +141,8 @@ def plotReplicaComparison(tcp_data, udp_data, label):
         best = replica.iloc[0, :]
 
         udp_data_latency.append(best.loc['avg'])
-        y_min = best.loc['min']
-        y_max = best.loc['max']
+        y_min = best.loc['avg'] - best.loc['min']
+        y_max = best.loc['max'] - best.loc['avg']
         udp_error_bars.append((y_min, y_max))
 
     udpError = [[a[0] for a in udp_error_bars], [a[1] for a in udp_error_bars]]
@@ -189,8 +185,8 @@ def plotClientComparison(tcp_data, udp_data, label):
         best = client.iloc[0, :]
 
         tcp_data_latency.append(best.loc['avg'])
-        y_min = best.loc['min']
-        y_max = best.loc['max']
+        y_min = best.loc['avg'] - best.loc['min']
+        y_max = best.loc['max'] - best.loc['avg']
         tcp_error_bars.append((y_min, y_max))
 
     tcpError = [[error[0] for error in tcp_error_bars], [error[1] for error in tcp_error_bars]]
@@ -210,8 +206,8 @@ def plotClientComparison(tcp_data, udp_data, label):
         best = client.iloc[0, :]
 
         udp_data_latency.append(best.loc['avg'])
-        y_min = best.loc['min']
-        y_max = best.loc['max']
+        y_min = best.loc['avg'] - best.loc['min']
+        y_max = best.loc['max'] - best.loc['avg']
         udp_error_bars.append((y_min, y_max))
 
     udpError = [[a[0] for a in udp_error_bars], [a[1] for a in udp_error_bars]]
@@ -254,8 +250,8 @@ def plotDropComparison(tcp_data, udp_data, label):
         best = drop.iloc[0, :]
 
         tcp_data_latency.append(best.loc['avg'])
-        y_min = best.loc['min']
-        y_max = best.loc['max']
+        y_min = best.loc['avg'] - best.loc['min']
+        y_max = best.loc['max'] - best.loc['avg']
         tcp_error_bars.append((y_min, y_max))
 
     tcpError = [[error[0] for error in tcp_error_bars], [error[1] for error in tcp_error_bars]]
@@ -275,8 +271,8 @@ def plotDropComparison(tcp_data, udp_data, label):
         best = drop.iloc[0, :]
 
         udp_data_latency.append(best.loc['avg'])
-        y_min = best.loc['min']
-        y_max = best.loc['max']
+        y_min = best.loc['avg'] - best.loc['min']
+        y_max = best.loc['max'] - best.loc['avg']
         udp_error_bars.append((y_min, y_max))
 
     udpError = [[a[0] for a in udp_error_bars], [a[1] for a in udp_error_bars]]
@@ -319,8 +315,8 @@ def plotFailComparison(tcp_data, udp_data, label):
         best = fail.iloc[0, :]
 
         tcp_data_latency.append(best.loc['avg'])
-        y_min = best.loc['min']
-        y_max = best.loc['max']
+        y_min = best.loc['avg'] - best.loc['min']
+        y_max = best.loc['max'] - best.loc['avg']
         tcp_error_bars.append((y_min, y_max))
 
     tcpError = [[error[0] for error in tcp_error_bars], [error[1] for error in tcp_error_bars]]
@@ -340,8 +336,8 @@ def plotFailComparison(tcp_data, udp_data, label):
         best = fail.iloc[0, :]
 
         udp_data_latency.append(best.loc['avg'])
-        y_min = best.loc['min']
-        y_max = best.loc['max']
+        y_min = best.loc['avg'] - best.loc['min']
+        y_max = best.loc['max'] - best.loc['avg']
         udp_error_bars.append((y_min, y_max))
 
     udpError = [[a[0] for a in udp_error_bars], [a[1] for a in udp_error_bars]]

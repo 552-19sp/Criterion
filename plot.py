@@ -175,7 +175,7 @@ def plotClientComparison(tcp_data, udp_data, label):
     for client_count in x_axis:
         # Average latency across the same settings across num_ops
         udp_table = udp_data
-        replica_query = "SELECT num_clients, num_servers, drop_rate, failure_code, AVG(avg_latency) AS avg \
+        client_query = "SELECT num_clients, num_servers, drop_rate, failure_code, AVG(avg_latency) AS avg \
                 FROM udp_table \
                 WHERE num_clients = " + client_count + " GROUP BY \
                 num_clients, num_servers, drop_rate, failure_code \

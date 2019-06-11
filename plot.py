@@ -308,9 +308,9 @@ if __name__ == "__main__":
                 right_data = ingest(input_file)
             plotTopNLatency(left_data, 'UCP ' + ALGORITHM)
 
-            plotReplicaComparison(left_data, right_data, ALGORITHM)
+            # plotReplicaComparison(left_data, right_data, ALGORITHM)
             plotClientComparison(left_data, right_data, ALGORITHM)
-            plotDropComparison(left_data, right_data, ALGORITHM)
-            plotFailComparison(left_data, right_data, ALGORITHM)
+            # plotDropComparison(left_data, right_data, ALGORITHM)
+            # plotFailComparison(left_data, right_data, ALGORITHM)
         
         plt.show()

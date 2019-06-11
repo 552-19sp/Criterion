@@ -15,7 +15,7 @@ import pandasql as ps
 
 ALGORITHM = 'Mencius'
 PLOTS_PER_GRAPH = 5
-REPLICA = ['3', '5']
+REPLICA = ['3']
 CLIENT = ['1', '2', '3']
 DROP = ['0', '2', '5']
 FAIL = ['0', '1']
@@ -90,7 +90,7 @@ def plotTopNLatency(base_data, label):
 
     # Plotting
     graph = pd.DataFrame(y_map, index= x_axis, columns=line_label)
-    plot = graph.plot(yerr=error_bar[1:])
+    plot = graph.plot(yerr=error_bars[1:])
     plot.set_xlabel("Throughput")
     plot.set_ylabel("Latency")
     plot.set_title("Top Throughput VS Latency: " + label)
@@ -237,8 +237,9 @@ def plotDropComparison(tcp_data, udp_data, label):
     udp_data_latency = []
 
     x_axis = DROP 
-    bar_labels = ['TCP', 'UDP']
+    bar_labels = ['UDP']
 
+    """
     tcp_error_bars = []
     # TCP
     for drop_count in x_axis:
@@ -259,7 +260,8 @@ def plotDropComparison(tcp_data, udp_data, label):
         tcp_error_bars.append((y_min, y_max))
 
     tcpError = [[error[0] for error in tcp_error_bars], [error[1] for error in tcp_error_bars]]
-    
+    """
+
     udp_error_bars = []
     # UDP
     for drop_count in x_axis:
@@ -281,14 +283,14 @@ def plotDropComparison(tcp_data, udp_data, label):
 
     udpError = [[a[0] for a in udp_error_bars], [a[1] for a in udp_error_bars]]
 
-    y_map = {bar_labels[0]: tcp_data_latency, bar_labels[1]: udp_data_latency}
+    y_map = {bar_labels[0]: udp_data_latency}
 
     # Plotting
     graph = pd.DataFrame(y_map, index= x_axis, columns=bar_labels)
-    plot = graph.plot.bar(rot=0, yerr= [tcpError, udpError])
+    plot = graph.plot.bar(rot=0, yerr= udpError)
     plot.set_xlabel("Drop Rate (Per 1000)")
     plot.set_ylabel("Latency")
-    plot.set_title(label + " TCP VS UDP: Drop Rate Latency")
+    plot.set_title(label + " UDP: Drop Rate Latency")
     
     
 """

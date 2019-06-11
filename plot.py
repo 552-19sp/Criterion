@@ -372,7 +372,7 @@ if __name__ == "__main__":
             right_data = 0
             with open(sys.argv[2] , mode='r') as input_file:
                 right_data = ingest(input_file)
-            plotTopNLatency(left_data, 'UDP ' + ALGORITHM)
+            plotTopNLatency(right_data, 'UDP ' + ALGORITHM)
 
             # plotReplicaComparison(left_data, right_data, ALGORITHM)
             plotClientComparison(left_data, right_data, ALGORITHM)

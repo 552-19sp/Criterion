@@ -90,7 +90,7 @@ def plotTopNLatency(base_data, label):
 
     # Plotting
     graph = pd.DataFrame(y_map, index= x_axis, columns=line_label)
-    plot = graph.plot(yerr=error_bar[1:])
+    plot = graph.plot(yerr=error_bars[1:])
     plot.set_xlabel("Throughput")
     plot.set_ylabel("Latency")
     plot.set_title("Top Throughput VS Latency: " + label)
@@ -374,7 +374,7 @@ if __name__ == "__main__":
 
             # plotReplicaComparison(left_data, right_data, ALGORITHM)
             plotClientComparison(left_data, right_data, ALGORITHM)
-            # plotDropComparison(left_data, right_data, ALGORITHM)
-            # plotFailComparison(left_data, right_data, ALGORITHM)
+            plotDropComparison(left_data, right_data, ALGORITHM)
+            plotFailComparison(left_data, right_data, ALGORITHM)
         
         plt.show()

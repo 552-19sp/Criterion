@@ -15,6 +15,10 @@ import pandasql as ps
 
 ALGORITHM = 'Mencius'
 PLOTS_PER_GRAPH = 5
+REPLICA = ['3', '5']
+CLIENT = ['1', '2', '3']
+DROP = ['0', '2', '5']
+FAIL = ['0', '1']
 
 """
 Returns a DataFrame with the Error Bars given each of the configurations
@@ -102,7 +106,7 @@ def plotReplicaComparison(tcp_data, udp_data, label):
     tcp_data_latency = []
     udp_data_latency = []
 
-    x_axis = ['3', '5']
+    x_axis = REPLICA
     bar_labels = ['TCP', 'UDP']
 
     tcp_error_bars = []
@@ -167,7 +171,7 @@ def plotClientComparison(tcp_data, udp_data, label):
     tcp_data_latency = []
     udp_data_latency = []
 
-    x_axis = ['1', '2', '3']
+    x_axis = CLIENT 
     bar_labels = ['TCP', 'UDP']
 
     tcp_error_bars = []
@@ -232,7 +236,7 @@ def plotDropComparison(tcp_data, udp_data, label):
     tcp_data_latency = []
     udp_data_latency = []
 
-    x_axis = ['0', '2', '5']
+    x_axis = DROP 
     bar_labels = ['TCP', 'UDP']
 
     tcp_error_bars = []
@@ -297,7 +301,7 @@ def plotFailComparison(tcp_data, udp_data, label):
     tcp_data_latency = []
     udp_data_latency = []
 
-    x_axis = ['0', '1']
+    x_axis = FAIL 
     bar_labels = ['TCP', 'UDP']
 
     tcp_error_bars = []

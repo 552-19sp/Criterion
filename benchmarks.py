@@ -7,8 +7,8 @@ import sys
 
 NUM_CLIENTS = [1, 2, 3] # Number of clients to benchmark with.
 NUM_SERVERS = [3] # Number of servers each test cluster should have.
-DROP_RATES = [0] # Out of 1000, the server drop rates to test.
-NUM_BENCH_OPS = [10] # Number of ops to test per benchmark.
+DROP_RATES = [0, 2, 5] # Out of 1000, the server drop rates to test.
+NUM_BENCH_OPS = [10, 50, 100] # Number of ops to test per benchmark.
 NUM_CLIENT_OPS = 10000 # Number of background client ops.
 NUM_ITERATIONS = 5
 
@@ -28,7 +28,7 @@ def run_background_clients(num_clients, num_servers, drop_rate, failure_code):
     for _ in range(num_clients):
         joined_ops = ','.join([CMD] * NUM_CLIENT_OPS)
         CLIENT_PROCS.append(subprocess.Popen(
-            (CLIENT_EXE, str(num_servers), str(failure_code), str(drop_rate), joined_ops),
+            (CLIENT_EXE, str(num_servers), str(drop_rate), str(failure_code), joined_ops),
             stdout=subprocess.PIPE))
 
 

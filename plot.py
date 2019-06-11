@@ -109,37 +109,53 @@ def plotReplicaComparison(tcp_data, udp_data, label):
     x_axis = ['3', '5']
     bar_labels = ['TCP', 'UDP']
 
+    tcp_error_bars = []
     # TCP
     for replica_count in x_axis:
         # Average latency across the same settings across num_ops
         tcp_table = tcp_data
-        replica_query = "SELECT num_clients, num_servers, drop_rate, failure_code, AVG(avg_latency) AS avg \
+        replica_query = "SELECT num_clients, num_servers, drop_rate, failure_code, \
+                MIN(avg_latency) AS min, MAX(avg_latency) as max, AVG(avg_latency) AS avg \
                 FROM tcp_table \
                 WHERE num_servers = " + replica_count + " GROUP BY \
                 num_clients, num_servers, drop_rate, failure_code \
                 ORDER BY AVG(avg_latency)"
         replica = ps.sqldf(replica_query, locals())
         best = replica.iloc[0, :]
+
         tcp_data_latency.append(best.loc['avg'])
+        y_min = best.loc['min']
+        y_max = best.loc['max']
+        tcp_error_bars.append((y_min, y_max))
+
+    tcpError = [[error[0] for error in tcp_error_bars], [error[1] for error in tcp_error_bars]]
     
+    udp_error_bars = []
     # UDP
     for replica_count in x_axis:
         # Average latency across the same settings across num_ops
         udp_table = udp_data
-        replica_query = "SELECT num_clients, num_servers, drop_rate, failure_code, AVG(avg_latency) AS avg \
+        replica_query = "SELECT num_clients, num_servers, drop_rate, failure_code, \
+                MIN(avg_latency) AS min, MAX(avg_latency) as max, AVG(avg_latency) AS avg \
                 FROM udp_table \
                 WHERE num_servers = " + replica_count + " GROUP BY \
                 num_clients, num_servers, drop_rate, failure_code \
                 ORDER BY AVG(avg_latency)"
         replica = ps.sqldf(replica_query, locals())
         best = replica.iloc[0, :]
+
         udp_data_latency.append(best.loc['avg'])
+        y_min = best.loc['min']
+        y_max = best.loc['max']
+        udp_error_bars.append((y_min, y_max))
+
+    udpError = [[a[0] for a in udp_error_bars], [a[1] for a in udp_error_bars]]
 
     y_map = {bar_labels[0]: tcp_data_latency, bar_labels[1]: udp_data_latency}
 
     # Plotting
     graph = pd.DataFrame(y_map, index= x_axis, columns=bar_labels)
-    plot = graph.plot.bar(rot=0)
+    plot = graph.plot.bar(rot=0, yerr= [tcpError, udpError])
     plot.set_xlabel("Number of Replica")
     plot.set_ylabel("Latency")
     plot.set_title(label + " TCP VS UDP: Replica Latency")
@@ -158,37 +174,53 @@ def plotClientComparison(tcp_data, udp_data, label):
     x_axis = ['1', '2', '3']
     bar_labels = ['TCP', 'UDP']
 
+    tcp_error_bars = []
     # TCP
     for client_count in x_axis:
         # Average latency across the same settings across num_ops
         tcp_table = tcp_data
-        client_query = "SELECT num_clients, num_servers, drop_rate, failure_code, AVG(avg_latency) AS avg \
+        client_query = "SELECT num_clients, num_servers, drop_rate, failure_code, \
+                MIN(avg_latency) AS min, MAX(avg_latency) as max, AVG(avg_latency) AS avg \
                 FROM tcp_table \
                 WHERE num_clients = " + client_count + " GROUP BY \
                 num_clients, num_servers, drop_rate, failure_code \
                 ORDER BY AVG(avg_latency)"
         client = ps.sqldf(client_query, locals())
         best = client.iloc[0, :]
+
         tcp_data_latency.append(best.loc['avg'])
+        y_min = best.loc['min']
+        y_max = best.loc['max']
+        tcp_error_bars.append((y_min, y_max))
+
+    tcpError = [[error[0] for error in tcp_error_bars], [error[1] for error in tcp_error_bars]]
     
+    udp_error_bars = []
     # UDP
     for client_count in x_axis:
         # Average latency across the same settings across num_ops
         udp_table = udp_data
-        client_query = "SELECT num_clients, num_servers, drop_rate, failure_code, AVG(avg_latency) AS avg \
+        client_query = "SELECT num_clients, num_servers, drop_rate, failure_code, \
+                MIN(avg_latency) AS min, MAX(avg_latency) as max, AVG(avg_latency) AS avg \
                 FROM udp_table \
                 WHERE num_clients = " + client_count + " GROUP BY \
                 num_clients, num_servers, drop_rate, failure_code \
                 ORDER BY AVG(avg_latency)"
         client = ps.sqldf(client_query, locals())
         best = client.iloc[0, :]
+
         udp_data_latency.append(best.loc['avg'])
+        y_min = best.loc['min']
+        y_max = best.loc['max']
+        udp_error_bars.append((y_min, y_max))
+
+    udpError = [[a[0] for a in udp_error_bars], [a[1] for a in udp_error_bars]]
 
     y_map = {bar_labels[0]: tcp_data_latency, bar_labels[1]: udp_data_latency}
 
     # Plotting
     graph = pd.DataFrame(y_map, index= x_axis, columns=bar_labels)
-    plot = graph.plot.bar(rot=0)
+    plot = graph.plot.bar(rot=0, yerr= [tcpError, udpError])
     plot.set_xlabel("Number of Clients")
     plot.set_ylabel("Latency")
     plot.set_title(label + " TCP VS UDP: Client Latency")
@@ -207,37 +239,53 @@ def plotDropComparison(tcp_data, udp_data, label):
     x_axis = ['0', '2', '5']
     bar_labels = ['TCP', 'UDP']
 
+    tcp_error_bars = []
     # TCP
     for drop_count in x_axis:
         # Average latency across the same settings across num_ops
         tcp_table = tcp_data
-        drop_query = "SELECT num_clients, num_servers, drop_rate, failure_code, AVG(avg_latency) AS avg \
+        drop_query = "SELECT num_clients, num_servers, drop_rate, failure_code, \
+                MIN(avg_latency) AS min, MAX(avg_latency) as max, AVG(avg_latency) AS avg \
                 FROM tcp_table \
                 WHERE drop_rate = " + drop_count + " GROUP BY \
                 num_clients, num_servers, drop_rate, failure_code \
                 ORDER BY AVG(avg_latency)"
         drop = ps.sqldf(drop_query, locals())
         best = drop.iloc[0, :]
+
         tcp_data_latency.append(best.loc['avg'])
+        y_min = best.loc['min']
+        y_max = best.loc['max']
+        tcp_error_bars.append((y_min, y_max))
+
+    tcpError = [[error[0] for error in tcp_error_bars], [error[1] for error in tcp_error_bars]]
     
+    udp_error_bars = []
     # UDP
     for drop_count in x_axis:
         # Average latency across the same settings across num_ops
         udp_table = udp_data
-        drop_query = "SELECT num_clients, num_servers, drop_rate, failure_code, AVG(avg_latency) AS avg \
+        drop_query = "SELECT num_clients, num_servers, drop_rate, failure_code, \
+                MIN(avg_latency) AS min, MAX(avg_latency) as max, AVG(avg_latency) AS avg \
                 FROM udp_table \
                 WHERE drop_rate = " + drop_count + " GROUP BY \
                 num_clients, num_servers, drop_rate, failure_code \
                 ORDER BY AVG(avg_latency)"
         drop = ps.sqldf(drop_query, locals())
         best = drop.iloc[0, :]
+
         udp_data_latency.append(best.loc['avg'])
+        y_min = best.loc['min']
+        y_max = best.loc['max']
+        udp_error_bars.append((y_min, y_max))
+
+    udpError = [[a[0] for a in udp_error_bars], [a[1] for a in udp_error_bars]]
 
     y_map = {bar_labels[0]: tcp_data_latency, bar_labels[1]: udp_data_latency}
 
     # Plotting
     graph = pd.DataFrame(y_map, index= x_axis, columns=bar_labels)
-    plot = graph.plot.bar(rot=0)
+    plot = graph.plot.bar(rot=0, yerr= [tcpError, udpError])
     plot.set_xlabel("Drop Rate (Per 1000)")
     plot.set_ylabel("Latency")
     plot.set_title(label + " TCP VS UDP: Drop Rate Latency")
@@ -256,37 +304,53 @@ def plotFailComparison(tcp_data, udp_data, label):
     x_axis = ['0', '1']
     bar_labels = ['TCP', 'UDP']
 
+    tcp_error_bars = []
     # TCP
     for fail_count in x_axis:
         # Average latency across the same settings across num_ops
         tcp_table = tcp_data
-        fail_query = "SELECT num_clients, num_servers, drop_rate, failure_code, AVG(avg_latency) AS avg \
+        fail_query = "SELECT num_clients, num_servers, drop_rate, failure_code, \
+                MIN(avg_latency) AS min, MAX(avg_latency) as max, AVG(avg_latency) AS avg \
                 FROM tcp_table \
                 WHERE failure_code = " + fail_count + " GROUP BY \
                 num_clients, num_servers, drop_rate, failure_code \
                 ORDER BY AVG(avg_latency)"
         fail = ps.sqldf(fail_query, locals())
         best = fail.iloc[0, :]
+
         tcp_data_latency.append(best.loc['avg'])
+        y_min = best.loc['min']
+        y_max = best.loc['max']
+        tcp_error_bars.append((y_min, y_max))
+
+    tcpError = [[error[0] for error in tcp_error_bars], [error[1] for error in tcp_error_bars]]
     
+    udp_error_bars = []
     # UDP
     for fail_count in x_axis:
         # Average latency across the same settings across num_ops
         udp_table = udp_data
-        fail_query = "SELECT num_clients, num_servers, drop_rate, failure_code, AVG(avg_latency) AS avg \
+        fail_query = "SELECT num_clients, num_servers, drop_rate, failure_code, \
+                MIN(avg_latency) AS min, MAX(avg_latency) as max, AVG(avg_latency) AS avg \
                 FROM udp_table \
                 WHERE failure_code = " + fail_count + " GROUP BY \
                 num_clients, num_servers, drop_rate, failure_code \
                 ORDER BY AVG(avg_latency)"
         fail = ps.sqldf(fail_query, locals())
         best = fail.iloc[0, :]
+
         udp_data_latency.append(best.loc['avg'])
+        y_min = best.loc['min']
+        y_max = best.loc['max']
+        udp_error_bars.append((y_min, y_max))
+
+    udpError = [[a[0] for a in udp_error_bars], [a[1] for a in udp_error_bars]]
 
     y_map = {bar_labels[0]: tcp_data_latency, bar_labels[1]: udp_data_latency}
 
     # Plotting
     graph = pd.DataFrame(y_map, index= ['No Failure', 'Random Failure'], columns=bar_labels)
-    plot = graph.plot.bar(rot=0)
+    plot = graph.plot.bar(rot=0, yerr= [tcpError, udpError])
     plot.set_xlabel("Failure Mode")
     plot.set_ylabel("Latency")
     plot.set_title(label + " TCP VS UDP: Failure Mode Latency")
